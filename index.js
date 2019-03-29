@@ -16,10 +16,11 @@ server.get('/', (req, res) => {
 })
 
 
-// C - Create 
 // /api/projects
+// C - Create 
 server.post('/api/projects', (req, res) => {
-    db('projects').insert(req.body)
+    db('projects')
+    .insert(req.body)
     .then(projectId => {
         const [ id ] = projectId;
         res.status(201).json({ id: id});
@@ -28,6 +29,32 @@ server.post('/api/projects', (req, res) => {
         res.status(500).json({ message: "Could not add the project" })
     })
 })
+
+
+// /api/projects/:id
+// R - Read
+server.get('/api/projects/:id', (req, res) => {
+    const id = req.params.id;
+    db('projects')
+    .where("id", id)
+    .then(project => {
+        db('actions')
+        .where("project_id", id)
+        .then(actions => {
+            let item = project;
+            let actions_item = actions;
+            let wholeProject = Object.assign(item[0], {actions: actions_item})
+            res.status(200).json(wholeProject);
+        })
+        .catch(err => {
+            res.status(500).json({ message: "Actions could not be retrieved" })
+        })
+    })
+    .catch(err => {
+        res.status(500).json({ message: 'Error Retrieving Projects' })
+    })
+})
+
 
 
 const port = process.env.PORT || 5000;
