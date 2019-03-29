@@ -17,7 +17,7 @@ server.get('/', (req, res) => {
 
 
 // /api/projects
-// C - Create 
+// C - Create (post)
 server.post('/api/projects', (req, res) => {
     db('projects')
     .insert(req.body)
@@ -32,7 +32,7 @@ server.post('/api/projects', (req, res) => {
 
 
 // /api/projects/:id
-// R - Read
+// R - Read (get)
 server.get('/api/projects/:id', (req, res) => {
     const id = req.params.id;
     db('projects')
@@ -55,6 +55,19 @@ server.get('/api/projects/:id', (req, res) => {
     })
 })
 
+// /api/actions
+// C - Create (post)
+server.post('/api/actions', (req, res) => {
+    db('actions')
+    .insert(req.body)
+    .then(actionId => {
+        const [ id ] = actionId;
+        res.status(201).json({ id: id});
+    })
+    .catch(err => {
+        res.status(500).json({ message: "Could not add that action" })
+    })
+})
 
 
 const port = process.env.PORT || 5000;
